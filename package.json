@@ -1,7 +1,7 @@
 {
   "name": "@agentruntime-labs/agentruntime-mcp",
   "version": "0.0.1",
-  "description": "AgentRuntime MCP SDK (TypeScript) - Opinionated SDK for building MCP agents with FastMCP",
+  "description": "AgentRuntime MCP SDK (TypeScript) — parity with agentruntime-mcp-go using @modelcontextprotocol/server",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -16,14 +16,17 @@
     "README.md"
   ],
   "dependencies": {
+    "@cfworker/json-schema": "^4.1.1",
+    "@modelcontextprotocol/node": "^2.0.0-alpha.2",
+    "@modelcontextprotocol/server": "^2.0.0-alpha.2",
+    "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.57.0",
     "@opentelemetry/resources": "^1.28.0",
     "@opentelemetry/sdk-trace-base": "^1.28.0",
     "@opentelemetry/sdk-trace-node": "^1.28.0",
     "@opentelemetry/semantic-conventions": "^1.28.0",
-    "fastmcp": "^3.34.0",
     "js-yaml": "^4.1.0",
-    "zod": "^3.23.0",
+    "zod": "^4.4.3",
     "zod-to-json-schema": "^3.23.0"
   },
   "devDependencies": {
@@ -37,13 +40,10 @@
     "test": "vitest run",
     "prepublishOnly": "npm run build"
   },
-  "peerDependencies": {
-    "fastmcp": ">=3.0.0"
-  },
   "keywords": [
     "mcp",
     "agentruntime",
-    "fastmcp"
+    "modelcontextprotocol"
   ],
   "author": "AgentRuntime",
   "license": "MIT"

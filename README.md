@@ -1,13 +1,17 @@
 # AgentRuntime MCP SDK (TypeScript)
 
-Opinionated SDK for building MCP agents with [FastMCP](https://www.npmjs.com/package/fastmcp).
+Opinionated SDK aligned with [`agentruntime-mcp-go`](https://github.com/agentruntime-io/agentruntime-mcp-go), built on the official [@modelcontextprotocol/server](https://www.npmjs.com/package/@modelcontextprotocol/server) streamable HTTP transport (JSON responses).
 
-> **Note:** This is the TypeScript/JavaScript equivalent of the Python [agentruntime-mcp](https://pypi.org/project/agentruntime-mcp/) package. Both share the same config format, auth modes, and control server integration.
+> **Note:** Same `config.yaml` shape and Control integration as the Go SDK (`POST /mcp/config`, optional env overrides per schema key, `GET …/config/schema`). Legacy FastMCP-only flows are removed.
+
+## Releasing
+
+See [`../RELEASE.md`](../RELEASE.md) (TypeScript section): bump `package.json`, `npm run build` before publish, do not commit `node_modules/` or `dist/`.
 
 ## Install
 
 ```bash
-npm install @agentruntime-labs/agentruntime-mcp fastmcp zod
+npm install @agentruntime-labs/agentruntime-mcp zod @cfworker/json-schema
 ```
 
 ## Minimal example
@@ -46,8 +50,8 @@ run("config.yaml");
 
 ## Config
 
-- `config.yaml` controls server host/port, auth mode, and tracing.
-- Env overrides: `HOST`, `PORT`, `MCP_AUTH_MODE`.
+- `config.yaml` controls server host/port, optional reserved `auth` keys, tracing, and the Control **config** schema.
+- Env overrides: **`HOST`**, **`PORT`**. Control integration uses **`MCP_CONTROL_SERVER_URL`**, **`MCP_CONFIG_FETCH_REQUIRED`**, etc. (see [`docs/mcp/mcp_env.md`](../../docs/mcp/mcp_env.md)); there is no mandatory FastMCP-style global token middleware — the run token arrives on the HTTP request.
 
 Example `config.yaml`:
 
@@ -59,7 +63,7 @@ server:
   stateless_http: true
 
 auth:
-  mode: token   # token|hmac|none
+  mode: token   # reserved for templates; Control uses request Bearer token
 
 tracing:
   enabled: false

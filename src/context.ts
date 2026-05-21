@@ -1,26 +1,38 @@
 /**
- * Request-scoped config context.
- * Resolved config from control server is exposed here for tool handlers.
+ * Request-scoped resolved Control config — mirror agentruntime-mcp-go context.go
  */
-import { AsyncLocalStorage } from "async_hooks";
+import { AsyncLocalStorage } from "node:async_hooks";
 
 export type ConfigView = Record<string, unknown>;
 
-const configStorage = new AsyncLocalStorage<ConfigView>();
+const storage = new AsyncLocalStorage<ConfigView>();
 
+/** Resolved config for the active MCP HTTP request (AsyncLocalStorage). */
+export function configFromContext(): ConfigView {
+  return storage.getStore() ?? {};
+}
+
+/** @deprecated Use {@link configFromContext}. */
 export function getConfig(): ConfigView {
-  const cfg = configStorage.getStore();
-  return cfg ?? {};
+  return configFromContext();
 }
 
-export function setRequestContext(config: ConfigView): void {
-  configStorage.enterWith(config);
+export function runWithResolvedConfig<T>(cfg: ConfigView, fn: () => T): T {
+  return storage.run(cfg, fn);
 }
 
-export function runWithConfig<T>(config: ConfigView, fn: () => T): T {
-  return configStorage.run(config, fn);
+export function runWithResolvedConfigAsync<T>(cfg: ConfigView, fn: () => Promise<T>): Promise<T> {
+  return storage.run(cfg, fn);
 }
 
-export function runWithConfigAsync<T>(config: ConfigView, fn: () => Promise<T>): Promise<T> {
-  return configStorage.run(config, fn);
+/** Match Go ConfigGetStr: tries prefix+key then bare key. */
+export function configGetStr(cfg: ConfigView | undefined, prefix: string, key: string, defaultValue: string): string {
+  if (!cfg) return defaultValue;
+  const keys = prefix ? [`${prefix}${key}`, key] : [key];
+  for (const k of keys) {
+    const v = cfg[k];
+    if (v === undefined || v === null) continue;
+    if (typeof v === "string" && v !== "") return v;
+  }
+  return defaultValue;
 }

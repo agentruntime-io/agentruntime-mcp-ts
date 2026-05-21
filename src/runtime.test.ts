@@ -71,9 +71,10 @@ config: {}
     }
   });
 
-  it("creates FastMCP server", () => {
-    const server = makeServer(configPath);
+  it("creates McpServer from official SDK", () => {
+    const cfg = loadConfig(configPath);
+    const { server } = makeServer(cfg);
     expect(server).toBeDefined();
-    expect(server).toHaveProperty("getApp");
+    expect(server.server).toBeDefined();
   });
 });

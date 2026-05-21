@@ -7,6 +7,7 @@ import * as fs from "fs";
 import * as http from "http";
 import * as path from "path";
 import yaml from "js-yaml";
+import { errProxyTarget } from "./errors.js";
 
 function loadOverlay(overlayFile: string | null): Record<string, unknown> {
   if (!overlayFile) return {};
@@ -99,6 +100,9 @@ export async function runProxy(
   host: string = "127.0.0.1",
   port: number = 8010
 ): Promise<void> {
+  if (!targetUrl.trim()) {
+    throw new Error(errProxyTarget);
+  }
   const server = http.createServer(async (req, res) => {
     if (req.method === "GET" && req.url && req.url.startsWith("/mcp/config/schema")) {
       res.setHeader("Content-Type", "application/json");
@@ -148,7 +152,7 @@ export async function runProxy(
       if (!targetUrl) {
         writeJsonRpcResponse(res, reqId, undefined, {
           code: -32600,
-          message: "Proxy target not configured",
+          message: String(errProxyTarget),
         });
         return;
       }
