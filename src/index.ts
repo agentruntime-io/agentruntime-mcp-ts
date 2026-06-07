@@ -69,6 +69,10 @@ export { buildProxyApp, runProxy } from "./proxy.js";
 
 export { signModeB as SignModeB, deliverModeB as DeliverModeB, type ModeBRequest } from "./webhook.js";
 
-export { HEADER_MCP_INSTANCE_ID } from "./control.js";
+export {
+  HEADER_MCP_INSTANCE_ID,
+  HEADER_MCP_SERVER_ID,
+  buildRuntimeContext,
+} from "./control.js";
 
 export { emitJsonShape, emitFlatShape, buildSchemas, type ZodSchema } from "./schemas.js";

@@ -7,6 +7,9 @@ import { logger } from "./logger.js";
 
 export const HEADER_MCP_INSTANCE_ID = "X-MCP-Instance-Id";
 
+/** Set by Control discover/validate probes so generic routes can resolve catalog server_id. */
+export const HEADER_MCP_SERVER_ID = "X-MCP-Server-Id";
+
 export async function fetchControlConfig(
   token: string,
   configSchema: Record<string, unknown>,
@@ -84,7 +87,9 @@ export function buildRuntimeContext(req: HeadersCarrier): Record<string, unknown
   const inst = headerFirst(hdrs, "x-mcp-instance-id");
   if (inst) ctx.instance_id = inst;
 
-  const sid = (process.env.MCP_SERVER_ID ?? "").trim();
+  let sid = headerFirst(hdrs, "x-mcp-server-id");
+  const envSid = (process.env.MCP_SERVER_ID ?? "").trim();
+  if (envSid) sid = envSid;
   if (sid) ctx.server_id = sid;
 
   let tn = headerFirst(hdrs, "x-tool-name");
