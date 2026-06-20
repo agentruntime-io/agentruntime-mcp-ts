@@ -42,6 +42,14 @@ export {
 
 export { handlerForAdapter, runWithRouter } from "./router.js";
 
+export { BRIDGE_MOUNT_PATH, handlerForBridge } from "./bridge.js";
+
+export {
+  applyAuthMapping,
+  applyHeaderMappings,
+  applyBridgeHeaders,
+} from "./bridge_auth.js";
+
 export { middleware, type StreamableHttpNext } from "./middleware.js";
 
 export {
@@ -73,6 +81,8 @@ export {
   HEADER_MCP_INSTANCE_ID,
   HEADER_MCP_SERVER_ID,
   buildRuntimeContext,
+  fetchControlPayload,
+  type ControlPayload,
 } from "./control.js";
 
 export { emitJsonShape, emitFlatShape, buildSchemas, type ZodSchema } from "./schemas.js";

@@ -12,6 +12,7 @@ import { middleware, type StreamableHttpNext } from "./middleware.js";
 import { wrapWithTracing, initTracing } from "./tracing.js";
 import { logger } from "./logger.js";
 import { normalizePath, splitQuery, ServeMux } from "./serve_mux.js";
+import { mountBridgeRoute } from "./bridge.js";
 
 function isWebhookAdapter(a: Adapter): a is Adapter & WebhookAdapter {
   return typeof (a as { registerWebhook?: unknown }).registerWebhook === "function";
@@ -80,6 +81,7 @@ export async function runWithRouter(configPath: string): Promise<http.Server> {
   }
 
   const routeHandlers = new Map<string, http.RequestListener>();
+  await mountBridgeRoute(configPath, routeHandlers);
   for (const name of names) {
     const mountPath = `/${name}/mcp`;
     routeHandlers.set(mountPath, await handlerForAdapter(configPath, name, mountPath));

@@ -1,6 +1,6 @@
 {
   "name": "@agentruntime-labs/agentruntime-mcp",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "AgentRuntime MCP SDK (TypeScript) — parity with agentruntime-mcp-go using @modelcontextprotocol/server",
   "type": "module",
   "main": "dist/index.js",
@@ -13,6 +13,8 @@
   },
   "files": [
     "dist",
+    "src",
+    "tsconfig.json",
     "README.md"
   ],
   "dependencies": {
@@ -37,6 +39,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "prepare": "npm run build",
     "test": "vitest run",
     "prepublishOnly": "npm run build"
   },
@@ -46,5 +49,8 @@
     "modelcontextprotocol"
   ],
   "author": "AgentRuntime",
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }

@@ -10,13 +10,21 @@ export const HEADER_MCP_INSTANCE_ID = "X-MCP-Instance-Id";
 /** Set by Control discover/validate probes so generic routes can resolve catalog server_id. */
 export const HEADER_MCP_SERVER_ID = "X-MCP-Server-Id";
 
-export async function fetchControlConfig(
+export interface ControlPayload {
+  config: ConfigView;
+  configSchema: Record<string, unknown>;
+  bridge?: Record<string, unknown>;
+}
+
+export async function fetchControlPayload(
   token: string,
   configSchema: Record<string, unknown>,
   runtimeContext: Record<string, unknown>
-): Promise<ConfigView | null> {
+): Promise<ControlPayload> {
   const base = (process.env.MCP_CONTROL_SERVER_URL ?? "").trim().replace(/\/$/, "");
-  if (!base) return null;
+  if (!base) {
+    return { config: {}, configSchema: {} };
+  }
 
   let timeoutSec = 5;
   const ts = process.env.MCP_CONTROL_TIMEOUT_SEC?.trim();
@@ -60,11 +68,27 @@ export async function fetchControlConfig(
     throw new ControlError(502, `${String(errControlConfig)}: invalid response`);
   }
 
+  const out: ControlPayload = { config: {}, configSchema: {} };
   const c = data.config;
-  if (c && typeof c === "object" && !Array.isArray(c)) return c as ConfigView;
-  const d = data.data;
-  if (d && typeof d === "object" && !Array.isArray(d)) return d as ConfigView;
-  return data as ConfigView;
+  if (c && typeof c === "object" && !Array.isArray(c)) out.config = c as ConfigView;
+  const cs = data.config_schema;
+  if (cs && typeof cs === "object" && !Array.isArray(cs)) {
+    out.configSchema = cs as Record<string, unknown>;
+  }
+  const b = data.bridge;
+  if (b && typeof b === "object" && !Array.isArray(b)) {
+    out.bridge = b as Record<string, unknown>;
+  }
+  return out;
+}
+
+export async function fetchControlConfig(
+  token: string,
+  configSchema: Record<string, unknown>,
+  runtimeContext: Record<string, unknown>
+): Promise<ConfigView | null> {
+  const p = await fetchControlPayload(token, configSchema, runtimeContext);
+  return p.config ?? {};
 }
 
 interface HeadersCarrier {
