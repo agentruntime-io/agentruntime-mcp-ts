@@ -132,6 +132,18 @@ await runProxy(
 );
 ```
 
+## Tool organization (`toolorg`)
+
+```typescript
+import { publisherMetadata } from "@agentruntime-labs/agentruntime-mcp";
+
+const meta = publisherMetadata("clickup_get_task", {});
+```
+
+Per-request caller bearer: `requestBearerFromContext()` (set by HTTP middleware).
+
+SDK parity checklist: [MCP_SDK_PARITY.md](../../docs/mcp/MCP_SDK_PARITY.md).
+
 ## Templates
 
 Example MCP server using this SDK:

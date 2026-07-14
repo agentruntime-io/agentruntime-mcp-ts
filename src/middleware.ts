@@ -14,6 +14,7 @@ import {
 } from "./env_schema.js";
 import { logger } from "./logger.js";
 import { runWithResolvedConfigAsync, type ConfigView } from "./context.js";
+import { runWithRequestBearerAsync } from "./request_bearer.js";
 import { normalizePath, splitQuery } from "./serve_mux.js";
 
 export type StreamableHttpNext = (
@@ -101,7 +102,9 @@ export function middleware(
     }
 
     const finalCfg = mergeControlWithEnvPriority(cfg, envKeys, configSchema);
-    await runWithResolvedConfigAsync(finalCfg, () => next(req, res, parsedBody));
+    await runWithRequestBearerAsync(token, () =>
+      runWithResolvedConfigAsync(finalCfg, () => next(req, res, parsedBody))
+    );
   };
 }
 

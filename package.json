@@ -1,6 +1,6 @@
 {
   "name": "@agentruntime-labs/agentruntime-mcp",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "description": "AgentRuntime MCP SDK (TypeScript) — parity with agentruntime-mcp-go using @modelcontextprotocol/server",
   "type": "module",
   "main": "dist/index.js",

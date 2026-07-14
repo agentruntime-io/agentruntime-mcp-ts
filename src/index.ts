@@ -86,3 +86,23 @@ export {
 } from "./control.js";
 
 export { emitJsonShape, emitFlatShape, buildSchemas, type ZodSchema } from "./schemas.js";
+
+export {
+  suggestFromWireName,
+  formatDisplayName,
+  publisherMetadata,
+  defaultPublisherMetadata,
+  groupLabel,
+  parseMetadata,
+  metadataIsEmpty,
+  mergeEffective,
+  type Metadata as ToolOrgMetadata,
+  type EffectiveOrganization,
+  type ToolGroup,
+} from "./toolorg.js";
+
+export {
+  requestBearerFromContext,
+  runWithRequestBearer,
+  runWithRequestBearerAsync,
+} from "./request_bearer.js";
