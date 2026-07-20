@@ -11,6 +11,8 @@ export interface ToolEntry<TIn = unknown, TOut = unknown> {
   inputSchema: z.ZodType<TIn>;
   outputSchema?: z.ZodType<TOut>;
   execute: (args: TIn, config: ConfigView) => TOut | Promise<TOut>;
+  /** When true, tool is registered in dev but excluded from catalog/publish. */
+  hold?: boolean;
 }
 
 const registry: ToolEntry[] = [];
@@ -21,6 +23,22 @@ export function tool<TIn, TOut>(options: ToolEntry<TIn, TOut>): void {
 
 export function getRegistry(): readonly ToolEntry[] {
   return registry;
+}
+
+export function registeredToolNames(): string[] {
+  return registry.map((entry) => entry.name);
+}
+
+export function heldToolNames(): string[] {
+  return registry.filter((entry) => entry.hold).map((entry) => entry.name);
+}
+
+export function getPublishableRegistry(): readonly ToolEntry[] {
+  return registry.filter((entry) => !entry.hold);
+}
+
+export function resetRegistry(): void {
+  registry.length = 0;
 }
 
 function toToolResult(result: unknown): CallToolResult {

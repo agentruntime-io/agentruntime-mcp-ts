@@ -71,7 +71,16 @@ export {
   errAdapterNotRegistered,
 } from "./errors.js";
 
-export { tool, mountDeclarativeTools, getRegistry, type ToolEntry } from "./registry.js";
+export {
+  tool,
+  mountDeclarativeTools,
+  getRegistry,
+  getPublishableRegistry,
+  registeredToolNames,
+  heldToolNames,
+  resetRegistry,
+  type ToolEntry,
+} from "./registry.js";
 
 export { buildProxyApp, runProxy } from "./proxy.js";
 
