@@ -16,7 +16,8 @@ export class ControlError extends Error {
   readonly name = "ControlError";
   constructor(
     readonly status: number,
-    readonly bodyText: string
+    readonly bodyText: string,
+    readonly retryAfterSec = 0
   ) {
     super(
       bodyText.trim()

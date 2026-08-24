@@ -1,94 +1,25 @@
 /**
- * Control POST /mcp/config client — mirror agentruntime-mcp-go control.go
+ * Control POST /mcp/config — mirror agentruntime-mcp-go control.go
  */
-import { ControlError, errControlConfig } from "./errors.js";
 import type { ConfigView } from "./context.js";
 import { logger } from "./logger.js";
+import { fetchControlConfigCached } from "./config_cache.js";
+import { fetchControlPayload, type ControlPayload } from "./control_client.js";
 
 export const HEADER_MCP_INSTANCE_ID = "X-MCP-Instance-Id";
 
 /** Set by Control discover/validate probes so generic routes can resolve catalog server_id. */
 export const HEADER_MCP_SERVER_ID = "X-MCP-Server-Id";
 
-export interface ControlPayload {
-  config: ConfigView;
-  configSchema: Record<string, unknown>;
-  bridge?: Record<string, unknown>;
-}
-
-export async function fetchControlPayload(
-  token: string,
-  configSchema: Record<string, unknown>,
-  runtimeContext: Record<string, unknown>
-): Promise<ControlPayload> {
-  const base = (process.env.MCP_CONTROL_SERVER_URL ?? "").trim().replace(/\/$/, "");
-  if (!base) {
-    return { config: {}, configSchema: {} };
-  }
-
-  let timeoutSec = 5;
-  const ts = process.env.MCP_CONTROL_TIMEOUT_SEC?.trim();
-  if (ts) {
-    const n = parseInt(ts, 10);
-    if (!Number.isNaN(n) && n > 0) timeoutSec = n;
-  }
-
-  const payload = {
-    configSchema,
-    config_schema: configSchema,
-    schema: configSchema,
-    runtimeContext,
-    runtime_context: runtimeContext,
-  };
-
-  let res: Response;
-  try {
-    res = await fetch(`${base}/mcp/config`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(timeoutSec * 1000),
-    });
-  } catch (e) {
-    throw new Error(`${String(errControlConfig)}: ${e instanceof Error ? e.message : String(e)}`);
-  }
-
-  const bodyText = await res.text();
-  if (!res.ok) {
-    throw new ControlError(res.status, bodyText);
-  }
-
-  let data: Record<string, unknown>;
-  try {
-    data = JSON.parse(bodyText) as Record<string, unknown>;
-  } catch {
-    throw new ControlError(502, `${String(errControlConfig)}: invalid response`);
-  }
-
-  const out: ControlPayload = { config: {}, configSchema: {} };
-  const c = data.config;
-  if (c && typeof c === "object" && !Array.isArray(c)) out.config = c as ConfigView;
-  const cs = data.config_schema;
-  if (cs && typeof cs === "object" && !Array.isArray(cs)) {
-    out.configSchema = cs as Record<string, unknown>;
-  }
-  const b = data.bridge;
-  if (b && typeof b === "object" && !Array.isArray(b)) {
-    out.bridge = b as Record<string, unknown>;
-  }
-  return out;
-}
+export type { ControlPayload };
+export { fetchControlPayload };
 
 export async function fetchControlConfig(
   token: string,
   configSchema: Record<string, unknown>,
   runtimeContext: Record<string, unknown>
 ): Promise<ConfigView | null> {
-  const p = await fetchControlPayload(token, configSchema, runtimeContext);
-  return p.config ?? {};
+  return fetchControlConfigCached(token, configSchema, runtimeContext);
 }
 
 interface HeadersCarrier {
